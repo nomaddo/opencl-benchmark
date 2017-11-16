@@ -1,8 +1,8 @@
 FLAG=-O3
 
-all: clean gpu
+all: gpu
 
-gpu: gpu.c sum.cl
+gpu: gpu.c mul.cl
 	$(CC) $(FLAG) $< -o $@ -lOpenCL
 
 clean:
