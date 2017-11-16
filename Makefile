@@ -1,18 +1,10 @@
-CC=gcc
+FLAG=-O3
 
-SRC_GPU=gpu.c
-SRC_CPU=cpu.c
-OUT_GPU=gpu
-OUT_CPU=cpu
+all: clean gpu
 
-all: clean gpu cpu
-
-gpu:
-	$(CC) $(SRC_GPU) -o $(OUT_GPU) -framework opencl
-
-cpu:
-	$(CC) $(SRC_CPU) -o $(OUT_CPU)
+gpu: gpu.c sum.cl
+	$(CC) $(FLAG) $< -o $@ -lOpenCL
 
 clean:
-	rm -f $(OUT_GPU) $(OUT_CPU)
+	rm -f gpu
 
