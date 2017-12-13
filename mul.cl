@@ -1,6 +1,6 @@
-kernel void hello(global float * val) {
-  size_t i = get_global_id(0);
-  for (int j = 0; j < 100; j++) {
-    val[i * 100 + j] *= 2;
-  }
-}
+kernel void hello(global float * x, global float * y) {
+
+  int ind = get_global_id(0);
+  float16 v = vload16 (ind, x);
+  v *= 2;
+  vstore16 (v, ind, x);

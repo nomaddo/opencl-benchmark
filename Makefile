@@ -1,4 +1,4 @@
-FLAG=-O3
+FLAG=-O0 -g
 
 all: gpu
 
@@ -7,4 +7,3 @@ gpu: gpu.c mul.cl
 
 clean:
 	rm -f gpu
-
