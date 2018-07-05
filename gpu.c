@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 #include <assert.h>
 
 #ifdef __APPLE__
@@ -10,6 +11,14 @@
 #endif
 
 #define MAX_SOURCE_SIZE (0x100000)
+
+
+double gettime()
+{
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  return t.tv_sec + (double)t.tv_usec * 1e-6;
+}
 
 int main(int argc, char * argv[]) {
   if (! (argc == 5)) {
@@ -79,7 +88,7 @@ int main(int argc, char * argv[]) {
   size_t local;
   ret = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local), &local, NULL);
 
-  clock_t begin = clock();
+  double begin = gettime();
 
   size_t global_item_size[] = { N };
   ret = clEnqueueNDRangeKernel (command_queue, kernel, 1, NULL,
@@ -89,6 +98,8 @@ int main(int argc, char * argv[]) {
     printf ("error code: %d\n", ret);
     assert (0);
   }
+
+  double end = gettime();
 
   ret = clEnqueueReadBuffer(command_queue, args[0], CL_TRUE, 0, sizeof(cl_float) * N, val, 0, NULL, NULL);
   assert (ret == CL_SUCCESS);
@@ -100,9 +111,7 @@ int main(int argc, char * argv[]) {
   ret = clFlush(command_queue);
   assert (ret == CL_SUCCESS);
 
-  clock_t end = clock();
-  double runtime = (double)(end - begin) / CLOCKS_PER_SEC;
-
+  double runtime = (end - begin);
 
   ret = clReleaseKernel(kernel);
   ret = clReleaseProgram(program);
@@ -114,7 +123,8 @@ int main(int argc, char * argv[]) {
   ret = clReleaseCommandQueue(command_queue);
   ret = clReleaseContext(context);
 
-  printf("Runtime: %lfms\n", runtime);
+  printf("%lf\n", runtime);
+  printf("%lf BGPS\n", N * sizeof(float) * 8 / runtime * 1e-9);
   free(source_str);
   return 0;
 }
